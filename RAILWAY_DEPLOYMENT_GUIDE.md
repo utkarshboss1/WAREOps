@@ -77,6 +77,7 @@ For **each** of these 7 services, repeat the following:
 3. Go to the service **Settings** tab:
    - **General → Service Name**: Rename to exactly the name in the table above (e.g., `auth-service`)
    - **Source → Root Directory**: Set to the path in the table above (e.g., `services/auth-service`)
+   - **Config-as-code → Add File Path**: Set this to `<Root-Directory>/railway.toml` (e.g., `services/auth-service/railway.toml`). **IMPORTANT:** Root Directory does not change which railway.toml is used by default, so you must explicitly set this file path.
    - **Networking**: Railway will auto-assign a private domain like `auth-service.railway.internal`. **Do NOT generate a public domain** for backend services.
 4. Go to the **Variables** tab:
    - Click **Add Reference** → select `DATABASE_URL` from PostgreSQL (for all services except `digital-twin-sync`)
@@ -150,9 +151,10 @@ The api-gateway is special: it builds the React SPA and serves it alongside the 
 
 1. Click **+ New** → **GitHub Repo** → select `WAREOps`
 2. Go to **Settings**:
-   - **Service Name**: `api-gateway`
-   - **Root Directory**: `.` (leave empty / set to repo root)
-   - The `railway.toml` at the repo root tells Railway to use `builder = "DOCKERFILE"` with `dockerfilePath = "infrastructure/nginx/Dockerfile"`
+   - **General → Service Name**: `api-gateway`
+   - **Source → Root Directory**: `.` (leave empty / set to repo root)
+   - **Config-as-code → Add File Path**: Set this to `infrastructure/nginx/railway.toml`
+   - The `infrastructure/nginx/railway.toml` tells Railway to use `builder = "DOCKERFILE"` with `dockerfilePath = "infrastructure/nginx/Dockerfile"`
 3. Go to **Networking** → **Generate Domain** → this creates your **public URL** (e.g., `api-gateway-production-xxxx.up.railway.app`)
 4. Go to **Variables** and add:
 
@@ -179,9 +181,10 @@ The robot simulator generates fake robot telemetry for demo purposes.
 
 1. Click **+ New** → **GitHub Repo** → select `WAREOps`
 2. **Settings**:
-   - **Service Name**: `robot-simulator`
-   - **Root Directory**: `apps/robot-simulator`
-   - Do NOT generate a public domain (it's a background worker)
+   - **General → Service Name**: `robot-simulator`
+   - **Source → Root Directory**: `apps/robot-simulator`
+   - **Config-as-code → Add File Path**: Set this to `apps/robot-simulator/railway.toml`
+   - **Networking**: Do NOT generate a public domain (it's a background worker)
 3. **Variables**:
 ```
 OBSERVATION_SERVICE_URL=http://observation-service.railway.internal:8003
@@ -252,7 +255,7 @@ python -m active_vision_scanner.remote_shell
 
 ### "Railpack could not determine how to build the app"
 **Cause:** Root Directory is not set correctly, or the `railway.toml` is not being found.
-**Fix:** Ensure each service's Root Directory in Settings points to the correct subdirectory (e.g., `services/auth-service`). The `railway.toml` in each directory explicitly sets `builder = "DOCKERFILE"`.
+**Fix:** Ensure each service's Root Directory in Settings points to the correct subdirectory (e.g., `services/auth-service`). You MUST also set **Config-as-code → Add File Path** explicitly for each service (e.g., `services/auth-service/railway.toml`), otherwise Railway defaults to the root directory which does not contain the correct configuration.
 
 ### Services can't reach each other
 **Cause:** Internal DNS names don't match.
