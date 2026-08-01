@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 from typing import Optional
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -23,6 +23,16 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore",
     )
+
+    # ── Railway DATABASE_URL auto-fix ─────────────────────────────────────────
+    @model_validator(mode="after")
+    def _fix_database_url_scheme(self) -> "Settings":
+        url = self.DATABASE_URL
+        if url.startswith("postgresql://"):
+            self.DATABASE_URL = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgres://"):
+            self.DATABASE_URL = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        return self
 
     # ── Service identity ──────────────────────────────────────────
     SERVICE_NAME: str = Field(default="alerting-service", description="Service identifier")

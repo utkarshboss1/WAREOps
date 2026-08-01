@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,6 +17,18 @@ class Settings(BaseSettings):
         case_sensitive=True,
         extra="ignore",
     )
+
+    # ── Railway DATABASE_URL auto-fix ─────────────────────────────────────────
+    # Railway provides DATABASE_URL as postgresql://... but SQLAlchemy async
+    # requires postgresql+asyncpg://... — transparently fix this on load.
+    @model_validator(mode="after")
+    def _fix_database_url_scheme(self) -> "Settings":
+        url = self.DATABASE_URL
+        if url.startswith("postgresql://"):
+            self.DATABASE_URL = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgres://"):
+            self.DATABASE_URL = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        return self
 
     # ── Service identity ──────────────────────────────────────────────────────
     SERVICE_NAME: str = Field(default="auth-service")
