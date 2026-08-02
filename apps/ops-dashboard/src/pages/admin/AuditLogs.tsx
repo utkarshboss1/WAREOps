@@ -167,11 +167,11 @@ export default function AuditLogs() {
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 
   return (
-    <div className="min-h-screen bg-[#080c14] p-6 space-y-5">
+    <div className="space-y-5">
       {showExport && <ExportModal onClose={() => setShowExport(false)} logs={filtered} />}
 
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-purple-400 mb-1">Compliance</p>
           <h1 className="text-2xl font-bold text-slate-100">Audit Logs</h1>
@@ -179,7 +179,7 @@ export default function AuditLogs() {
         </div>
         <button
           onClick={() => setShowExport(true)}
-          className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] px-5 py-2.5 text-sm font-semibold text-slate-300 transition-all cursor-pointer"
+          className="flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-300 transition-all cursor-pointer w-full sm:w-auto"
         >
           <Download className="h-4 w-4" /> Export Compliance Package
         </button>
@@ -187,14 +187,14 @@ export default function AuditLogs() {
 
       {/* Filter Bar */}
       <div className="flex flex-wrap gap-3 items-center rounded-2xl border border-white/[0.06] bg-white/[0.03] p-4">
-        <div className="relative">
+        <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-500" />
           <input
             type="text"
             placeholder="Search actor, event or resource..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="rounded-xl bg-white/[0.04] border border-white/[0.08] pl-9 pr-4 py-2 text-sm text-slate-300 placeholder-slate-600 outline-none focus:border-indigo-500 transition-colors w-64"
+            className="rounded-xl bg-white/[0.04] border border-white/[0.08] pl-9 pr-4 py-2 text-sm text-slate-300 placeholder-slate-600 outline-none focus:border-indigo-500 transition-colors w-full"
           />
         </div>
         <div className="flex flex-wrap gap-1.5">
