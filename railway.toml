@@ -1,32 +1,32 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# WAREOps — Railway Configuration (UNIFIED single-service deployment)
+# WAREOps — Railway Configuration (Unified single-service deployment)
 #
 # Railway footprint: 3 things total
 #   1. PostgreSQL plugin  (Railway managed)
 #   2. Redis plugin       (Railway managed)
-#   3. wareops-app        (this service — all 7 microservices + simulator + SPA)
-#
-# Add the Postgres and Redis plugins in the Railway dashboard.
-# Then create ONE service pointing at this repo.
+#   3. wareops-app        (this — all 7 microservices + SPA + simulator)
 # ─────────────────────────────────────────────────────────────────────────────
 
 [build]
-# Build context is the repo ROOT so the Dockerfile can:
-#   COPY apps/ops-dashboard/   (SPA source)
-#   COPY services/unified/app  (Python source)
-#   COPY warehouse_database.xlsx
 builder = "DOCKERFILE"
 dockerfilePath = "services/unified/Dockerfile"
+# IMPORTANT: build context must be repo root so Dockerfile can COPY:
+#   - apps/ops-dashboard/     (React SPA source)
+#   - services/unified/app    (Python app source)
+#   - warehouse_database.xlsx (seed data)
 buildContext = "."
 
-[build.buildArgs]
+[build.args]
 VITE_API_BASE_URL = "/api/v1"
 VITE_TOPOLOGY_API_URL = "/api/v1"
 VITE_WS_URL = ""
 
 [deploy]
+# The app responds to /health immediately on startup (returns 200 right away).
+# Full startup (DB seed, twin, simulator) happens in background — takes ~60s.
 healthcheckPath = "/health"
-healthcheckTimeout = 120
+# 5 minutes — gives Railway plenty of time for the DB/Redis to come up
+healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 5
 numReplicas = 1

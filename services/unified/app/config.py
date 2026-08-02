@@ -93,7 +93,19 @@ class Settings(BaseSettings):
     def fix_database_url(cls, v: Any) -> str:
         """Railway Postgres gives postgresql:// — asyncpg needs postgresql+asyncpg://."""
         if isinstance(v, str):
-            return v.replace("postgresql://", "postgresql+asyncpg://", 1) if v.startswith("postgresql://") else v
+            v = v.strip()
+            if v.startswith("postgresql://"):
+                return v.replace("postgresql://", "postgresql+asyncpg://", 1)
+            if v.startswith("postgres://"):
+                return v.replace("postgres://", "postgresql+asyncpg://", 1)
+        return v
+
+    @field_validator("REDIS_URL", mode="before")
+    @classmethod
+    def fix_redis_url(cls, v: Any) -> str:
+        """Ensure Redis URL has no trailing whitespace and is valid."""
+        if isinstance(v, str):
+            return v.strip()
         return v
 
     @field_validator("LOG_LEVEL")
