@@ -57,7 +57,7 @@ def mount_spa(app) -> None:
         SPA fallback: serve index.html for any path not matched by API routers.
         Excludes /api/v1/*, /socket.io/*, /health, /metrics, /docs, /redoc.
         """
-        excluded_prefixes = ("/api/v1/", "/socket.io/", "/health", "/metrics", "/docs", "/redoc", "/openapi")
+        excluded_prefixes = ("/api/v1/", "/socket.io/", "/health", "/metrics", "/docs", "/redoc", "/openapi", "/debug")
         for prefix in excluded_prefixes:
             if request.url.path.startswith(prefix):
                 from fastapi.responses import JSONResponse

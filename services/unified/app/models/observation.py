@@ -39,7 +39,7 @@ class Observation(Base):
     )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
     status: Mapped[str] = mapped_column(
-        Enum("PENDING", "PROCESSED", "FAILED", "DECODE_ERROR", name="observation_status", create_type=False),
+        Enum("PENDING", "PROCESSED", "FAILED", "DECODE_ERROR", name="observation_status", create_type=True),
         nullable=False, default="PENDING", server_default="PENDING"
     )
     processing_error: Mapped[str | None] = mapped_column(Text, nullable=True)

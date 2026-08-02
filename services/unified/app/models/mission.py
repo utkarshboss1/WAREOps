@@ -1,6 +1,10 @@
 """
 Mission domain ORM models — robots, missions, mission_zones.
-Uses PgEnums with create_type=False (enums already created by init.sql).
+
+PgEnums use create_type=True so that on a FRESH Postgres (e.g. Railway,
+where there is no init.sql) create_all creates the enum types itself.
+With checkfirst=True on create_all, this is fully idempotent on re-runs
+and on databases where init.sql already created the types.
 """
 from __future__ import annotations
 
@@ -17,11 +21,11 @@ from app.database import Base
 
 _robot_status = PgEnum(
     "IDLE", "AUDITING", "CHARGING", "FAULTED", "OFFLINE", "MAINTENANCE",
-    name="robot_status", create_type=False,
+    name="robot_status", create_type=True,
 )
 _mission_status = PgEnum(
     "SCHEDULED", "IN_PROGRESS", "COMPLETED", "FAILED", "CANCELLED", "PAUSED",
-    name="mission_status", create_type=False,
+    name="mission_status", create_type=True,
 )
 
 

@@ -1,6 +1,7 @@
 """
 Reconciliation domain ORM models — inventory, reconciliation_results, alerts.
-Canonical definitions; uses unified Base and PgEnums with create_type=False.
+Canonical definitions; uses unified Base. PgEnums use create_type=True so they
+are created on fresh Postgres (Railway) by create_all (idempotent via checkfirst).
 """
 from __future__ import annotations
 
@@ -17,15 +18,15 @@ from app.database import Base
 
 _mismatch_type = PgEnum(
     "CORRECT_PLACEMENT", "MISPLACED", "MISSING", "DUPLICATE", "UNKNOWN", "QUANTITY_DISCREPANCY",
-    name="mismatch_type", create_type=False,
+    name="mismatch_type", create_type=True,
 )
 _alert_severity = PgEnum(
     "INFO", "LOW", "MEDIUM", "HIGH", "CRITICAL",
-    name="alert_severity", create_type=False,
+    name="alert_severity", create_type=True,
 )
 _alert_status = PgEnum(
     "OPEN", "ACKNOWLEDGED", "ACTION_REQUIRED", "RESOLVED", "DISMISSED", "FALSE_POSITIVE",
-    name="alert_status", create_type=False,
+    name="alert_status", create_type=True,
 )
 
 

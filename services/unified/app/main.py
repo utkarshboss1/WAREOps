@@ -391,6 +391,20 @@ async def debug_tables() -> dict[str, Any]:
     return info
 
 
+@app.post("/debug/run_create_all", tags=["system"])
+async def debug_run_create_all() -> dict[str, Any]:
+    """Manually run create_all and return the result."""
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""))
+            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS ltree"))
+            await conn.run_sync(Base.metadata.create_all, checkfirst=True)
+        return {"status": "success", "message": "create_all executed without raising exceptions."}
+    except Exception as exc:
+        return {"status": "error", "error": str(exc), "type": str(type(exc))}
+
+
 # ── Extra utility endpoints ───────────────────────────────────────────────────
 
 @app.get("/api/v1/dashboard/stats", tags=["dashboard"])
