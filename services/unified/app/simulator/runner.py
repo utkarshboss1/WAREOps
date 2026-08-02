@@ -70,6 +70,20 @@ class EmbeddedRobotAgent:
         """Main robot loop — register, then cycle heartbeat + mission forever."""
         await asyncio.sleep(random.uniform(1.0, 5.0))  # stagger startup
 
+        # Wait for tables to exist before doing anything (guards against Railway cold start)
+        for _ in range(60):
+            try:
+                import httpx as _httpx
+                async with _httpx.AsyncClient(timeout=3.0) as c:
+                    r = await c.get(f"{self.base_url}/health")
+                    if r.status_code == 200:
+                        d = r.json()
+                        if d.get("db_ready") and d.get("ready"):
+                            break
+            except Exception:
+                pass
+            await asyncio.sleep(2.0)
+
         await self._register()
         await self._fetch_topology()
 
