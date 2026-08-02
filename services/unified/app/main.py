@@ -28,6 +28,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 from redis.asyncio import Redis, from_url as redis_from_url
+from sqlalchemy import text
 
 from app.config import settings
 from app.database import engine, AsyncSessionLocal
@@ -208,29 +209,40 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     global _db_ready
     logger.info("wareops_start", port=settings.PORT, env=settings.ENVIRONMENT)
 
-    # ── Create all tables (blocking — this is fast when tables already exist) ─
-    # On Railway's fresh Postgres, this is the first and most important step.
+    # ── Create extensions + all tables (blocking) ───────────────────────────────
+    # On Railway's fresh Postgres there is NO init.sql, so the uuid-ossp / pg_trgm
+    # extensions and the enum types don't exist yet. create_all now creates enums
+    # itself (create_type=True), but we must ensure the extensions exist first,
+    # because Observation.id uses server_default=func.uuid_generate_v4().
     # Retry up to 10 times (30 seconds total) to handle Railway's cold-start DNS.
     logger.info("lifespan.create_tables")
     created = False
+    last_error = ""
     for attempt in range(10):
         try:
             async with engine.begin() as conn:
+                # Ensure required Postgres extensions (idempotent).
+                await conn.execute(text("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""))
+                await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+                await conn.execute(text("CREATE EXTENSION IF NOT EXISTS ltree"))
+                # Then create all tables (enums are created inline by create_all).
                 await conn.run_sync(Base.metadata.create_all, checkfirst=True)
             logger.info("lifespan.create_tables_ok", attempt=attempt + 1)
             created = True
             break
         except Exception as exc:
+            last_error = str(exc)
             logger.warning(
                 "lifespan.create_tables_retry",
                 attempt=attempt + 1,
-                error=str(exc)[:120],
+                error=last_error[:300],
             )
             await asyncio.sleep(3.0)
 
     if not created:
         # DB still unreachable after 30 seconds — start anyway, handle gracefully
-        logger.error("lifespan.create_tables_failed_starting_anyway")
+        logger.error("lifespan.create_tables_failed_starting_anyway", error=last_error[:500])
+        _startup_error = f"create_all failed: {last_error[:200]}"
 
     _db_ready = True  # Tables exist (or we tried our best)
 
@@ -345,6 +357,38 @@ async def health_check() -> dict[str, Any]:
         "ready": _fully_ready,
         "checks": checks,
     }
+
+
+# ── /debug/tables — Diagnostic endpoint ───────────────────────────────────────
+
+@app.get("/debug/tables", tags=["system"])
+async def debug_tables() -> dict[str, Any]:
+    """Show which tables exist in the DB, what SQLAlchemy knows about, and startup state."""
+    info: dict[str, Any] = {
+        "db_ready": _db_ready,
+        "fully_ready": _fully_ready,
+        "startup_error": _startup_error,
+        "database_url_prefix": settings.DATABASE_URL[:40] + "..." if len(settings.DATABASE_URL) > 40 else settings.DATABASE_URL,
+        "metadata_tables": sorted(Base.metadata.tables.keys()),
+    }
+    try:
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(
+                text("SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename")
+            )
+            info["pg_tables"] = [r[0] for r in result.fetchall()]
+    except Exception as exc:
+        info["pg_tables_error"] = str(exc)[:500]
+
+    # Also check if users table has any rows
+    try:
+        async with AsyncSessionLocal() as session:
+            result = await session.execute(text("SELECT COUNT(*) FROM users"))
+            info["users_count"] = result.scalar()
+    except Exception as exc:
+        info["users_count_error"] = str(exc)[:300]
+
+    return info
 
 
 # ── Extra utility endpoints ───────────────────────────────────────────────────
