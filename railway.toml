@@ -1,112 +1,26 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# WAREOps — Railway Monorepo Configuration
+# WAREOps API Gateway — Railway Config-as-Code
 # ─────────────────────────────────────────────────────────────────────────────
 #
-# Architecture on Railway:
+# This file is picked up ONLY by the "api-gateway" service in Railway,
+# whose Root Directory is set to "." (repo root) so the Dockerfile can
+# access both infrastructure/nginx/ and apps/ops-dashboard/.
 #
-#   PUBLIC  → api-gateway  (nginx + React SPA, port exposed via Railway domain)
-#   INTERNAL → all 7 FastAPI services (no public port, internal Railway DNS)
-#   INTERNAL → robot-simulator (always-on worker, no port)
-#
-# Each service below maps to a Railway service of the same name.
-# Railway resolves internal hostnames as:
-#   <service-name>.railway.internal
-#
-# ENV VARS shared across services are set as Railway "shared variables" in
-# the dashboard. Service-specific vars override them per service.
+# Every other service has its own railway.toml in its own directory.
 # ─────────────────────────────────────────────────────────────────────────────
 
-# ── API Gateway (public-facing: nginx + React SPA) ───────────────────────────
-[services.api-gateway]
-[services.api-gateway.build]
-dockerfilePath    = "infrastructure/nginx/Dockerfile"
-# Build context must be repo root so the Dockerfile can COPY apps/ops-dashboard/
-buildContext      = "."
-buildArgs         = { VITE_API_BASE_URL = "/api/v1", VITE_TOPOLOGY_API_URL = "/api/v1", VITE_WS_URL = "" }
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "infrastructure/nginx/Dockerfile"
+watchPatterns = [
+  "infrastructure/nginx/**",
+  "apps/ops-dashboard/src/**",
+  "apps/ops-dashboard/package.json",
+  "apps/ops-dashboard/vite.config.ts",
+]
 
-[services.api-gateway.deploy]
-healthcheckPath     = "/health"
-healthcheckTimeout  = 300
-restartPolicyType   = "ON_FAILURE"
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 5
-numReplicas         = 1
-
-# ── Auth Service ──────────────────────────────────────────────────────────────
-[services.auth-service]
-[services.auth-service.build]
-dockerfilePath = "services/auth-service/Dockerfile"
-buildContext   = "services/auth-service"
-[services.auth-service.deploy]
-healthcheckPath    = "/health"
-healthcheckTimeout = 120
-restartPolicyType  = "ON_FAILURE"
-
-# ── Topology Service ──────────────────────────────────────────────────────────
-[services.topology-service]
-[services.topology-service.build]
-dockerfilePath = "services/topology-service/Dockerfile"
-buildContext   = "services/topology-service"
-[services.topology-service.deploy]
-healthcheckPath    = "/health"
-healthcheckTimeout = 120
-restartPolicyType  = "ON_FAILURE"
-
-# ── Mission Service ───────────────────────────────────────────────────────────
-[services.mission-service]
-[services.mission-service.build]
-dockerfilePath = "services/mission-service/Dockerfile"
-buildContext   = "services/mission-service"
-[services.mission-service.deploy]
-healthcheckPath    = "/health"
-healthcheckTimeout = 120
-restartPolicyType  = "ON_FAILURE"
-
-# ── Observation Service ───────────────────────────────────────────────────────
-[services.observation-service]
-[services.observation-service.build]
-dockerfilePath = "services/observation-service/Dockerfile"
-buildContext   = "services/observation-service"
-[services.observation-service.deploy]
-healthcheckPath    = "/health"
-healthcheckTimeout = 120
-restartPolicyType  = "ON_FAILURE"
-
-# ── Reconciliation Service ────────────────────────────────────────────────────
-[services.reconciliation-service]
-[services.reconciliation-service.build]
-dockerfilePath = "services/reconciliation-service/Dockerfile"
-buildContext   = "services/reconciliation-service"
-[services.reconciliation-service.deploy]
-healthcheckPath    = "/health"
-healthcheckTimeout = 120
-restartPolicyType  = "ON_FAILURE"
-
-# ── Alerting Service ──────────────────────────────────────────────────────────
-[services.alerting-service]
-[services.alerting-service.build]
-dockerfilePath = "services/alerting-service/Dockerfile"
-buildContext   = "services/alerting-service"
-[services.alerting-service.deploy]
-healthcheckPath    = "/health"
-healthcheckTimeout = 120
-restartPolicyType  = "ON_FAILURE"
-
-# ── Digital Twin Sync ─────────────────────────────────────────────────────────
-[services.digital-twin-sync]
-[services.digital-twin-sync.build]
-dockerfilePath = "services/digital-twin-sync/Dockerfile"
-buildContext   = "services/digital-twin-sync"
-[services.digital-twin-sync.deploy]
-healthcheckPath    = "/health"
-healthcheckTimeout = 120
-restartPolicyType  = "ON_FAILURE"
-
-# ── Robot Simulator (background worker, no public port) ───────────────────────
-[services.robot-simulator]
-[services.robot-simulator.build]
-dockerfilePath = "apps/robot-simulator/Dockerfile"
-buildContext   = "apps/robot-simulator"
-[services.robot-simulator.deploy]
-# No healthcheck path — simulator is a worker, not a server
-restartPolicyType       = "ON_FAILURE"
-restartPolicyMaxRetries = 10

@@ -9,8 +9,9 @@ http {
     access_log /var/log/nginx/access.log;
     error_log  /var/log/nginx/error.log warn;
 
-    # DNS resolver — Railway internal DNS, fallback to Docker embedded DNS
-    resolver 127.0.0.11 valid=30s ipv6=off;
+    # DNS resolver — use system DNS; Railway resolves *.railway.internal natively.
+    # 8.8.8.8 is fallback only; Railway's internal DNS handles service discovery.
+    resolver 8.8.8.8 8.8.4.4 valid=30s ipv6=off;
 
     # ── Upstream definitions via Railway internal hostnames ────────────────────
     # In Railway, each service is reachable at <service-name>.railway.internal

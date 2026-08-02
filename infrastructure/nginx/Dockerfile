@@ -47,15 +47,15 @@ COPY infrastructure/nginx/nginx.conf.template /etc/nginx/nginx.conf.template
 COPY infrastructure/nginx/start.sh /start.sh
 RUN chmod +x /start.sh
 
-# Railway sets PORT env var dynamically
+# Railway sets PORT env var dynamically; defaults below for Railway internal DNS
 ENV PORT=8080 \
-    AUTH_SERVICE_HOST=auth-service:8000 \
-    TOPOLOGY_SERVICE_HOST=topology-service:8001 \
-    MISSION_SERVICE_HOST=mission-service:8002 \
-    OBSERVATION_SERVICE_HOST=observation-service:8003 \
-    RECONCILIATION_SERVICE_HOST=reconciliation-service:8004 \
-    ALERTING_SERVICE_HOST=alerting-service:8005 \
-    TWIN_SERVICE_HOST=digital-twin-sync:8006
+    AUTH_SERVICE_HOST=auth-service.railway.internal:8000 \
+    TOPOLOGY_SERVICE_HOST=topology-service.railway.internal:8001 \
+    MISSION_SERVICE_HOST=mission-service.railway.internal:8002 \
+    OBSERVATION_SERVICE_HOST=observation-service.railway.internal:8003 \
+    RECONCILIATION_SERVICE_HOST=reconciliation-service.railway.internal:8004 \
+    ALERTING_SERVICE_HOST=alerting-service.railway.internal:8005 \
+    TWIN_SERVICE_HOST=digital-twin-sync.railway.internal:8006
 
 EXPOSE $PORT
 
