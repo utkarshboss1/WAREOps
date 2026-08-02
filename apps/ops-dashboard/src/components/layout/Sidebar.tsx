@@ -73,8 +73,13 @@ function getNavItems(role: UserRole): NavItem[] {
   }
 }
 
+interface SidebarProps {
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+}
+
 // ─── Sidebar Component ────────────────────────────────────────────────────────
-export function Sidebar() {
+export function Sidebar({ mobileOpen = false, onMobileClose }: SidebarProps) {
   const { user, logout } = useAuthStore();
   const { sidebarCollapsed, toggleSidebar } = useAppStore();
   const navigate = useNavigate();
@@ -84,104 +89,130 @@ export function Sidebar() {
   const handleLogout = async () => {
     await authApi.logout().catch(() => {});
     logout();
+    if (onMobileClose) onMobileClose();
     navigate('/auth/login');
   };
 
+  const handleNavClick = () => {
+    if (onMobileClose) onMobileClose();
+  };
+
   return (
-    <aside
-      className={clsx(
-        'fixed left-0 top-0 h-full z-30 flex flex-col glass-sidebar transition-all duration-300',
-        sidebarCollapsed ? 'w-16' : 'w-60'
-      )}
-      style={{ transitionTimingFunction: 'cubic-bezier(0.32,0.72,0,1)' }}
-    >
-      {/* Logo */}
-      <div className="flex items-center h-16 px-3 border-b border-white/06 flex-shrink-0">
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {mobileOpen && (
         <div
-          className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0"
-          style={{ background: 'var(--indigo)', boxShadow: 'var(--indigo-glow)' }}
-        >
-          <Bot size={18} className="text-white" />
-        </div>
-        {!sidebarCollapsed && (
-          <div className="ml-3 overflow-hidden">
+          onClick={onMobileClose}
+          className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-md md:hidden transition-opacity"
+        />
+      )}
+
+      <aside
+        className={clsx(
+          'fixed left-0 top-0 h-full z-50 flex flex-col glass-sidebar transition-all duration-300',
+          // Desktop behavior vs Mobile drawer behavior
+          'max-md:transform max-md:transition-transform max-md:duration-300',
+          mobileOpen ? 'max-md:translate-x-0 max-md:w-64' : 'max-md:-translate-x-full max-md:w-64',
+          sidebarCollapsed ? 'md:w-16' : 'md:w-60'
+        )}
+        style={{ transitionTimingFunction: 'cubic-bezier(0.32,0.72,0,1)' }}
+      >
+        {/* Logo */}
+        <div className="flex items-center h-16 px-3 border-b border-white/06 flex-shrink-0">
+          <div
+            className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0"
+            style={{ background: 'var(--indigo)', boxShadow: 'var(--indigo-glow)' }}
+          >
+            <Bot size={18} className="text-white" />
+          </div>
+          <div className={clsx('ml-3 overflow-hidden', sidebarCollapsed && 'md:hidden')}>
             <span className="font-bold text-slate-100 text-sm tracking-tight">WareOps</span>
             <p className="text-[10px] text-slate-500 leading-tight">Intelligence Platform</p>
           </div>
-        )}
-        <button
-          onClick={toggleSidebar}
-          className="ml-auto btn-icon p-1.5 flex-shrink-0"
-          title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {sidebarCollapsed ? (
-            <ChevronRight size={14} className="text-slate-400" />
-          ) : (
-            <ChevronLeft size={14} className="text-slate-400" />
-          )}
-        </button>
-      </div>
-
-      {/* Nav items */}
-      <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-0.5">
-        {navItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            title={sidebarCollapsed ? item.label : undefined}
-            className={({ isActive }) =>
-              clsx('nav-item', isActive && 'active', sidebarCollapsed && 'justify-center px-2')
-            }
+          
+          {/* Collapse button for desktop */}
+          <button
+            onClick={toggleSidebar}
+            className="ml-auto btn-icon p-1.5 flex-shrink-0 hidden md:flex"
+            title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            <span className="flex-shrink-0">{item.icon}</span>
-            {!sidebarCollapsed && (
-              <span className="truncate">{item.label}</span>
+            {sidebarCollapsed ? (
+              <ChevronRight size={14} className="text-slate-400" />
+            ) : (
+              <ChevronLeft size={14} className="text-slate-400" />
             )}
-            {!sidebarCollapsed && item.badge && (
-              <span className="ml-auto badge-danger text-xs">{item.badge}</span>
-            )}
-          </NavLink>
-        ))}
-      </nav>
+          </button>
 
-      {/* User section */}
-      {user && (
-        <div className="border-t border-white/06 p-2 flex-shrink-0">
-          <div
-            className={clsx(
-              'flex items-center gap-2.5 px-2 py-2.5 rounded-xl',
-              !sidebarCollapsed && 'mb-1'
-            )}
+          {/* Close button for mobile */}
+          <button
+            onClick={onMobileClose}
+            className="ml-auto btn-icon p-1.5 flex-shrink-0 md:hidden text-slate-400 hover:text-white"
+            title="Close menu"
           >
-            {/* Avatar */}
+            <ChevronLeft size={18} />
+          </button>
+        </div>
+
+        {/* Nav items */}
+        <nav className="flex-1 overflow-y-auto py-4 px-2 space-y-0.5">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={handleNavClick}
+              title={sidebarCollapsed ? item.label : undefined}
+              className={({ isActive }) =>
+                clsx('nav-item', isActive && 'active', sidebarCollapsed && 'md:justify-center md:px-2')
+              }
+            >
+              <span className="flex-shrink-0">{item.icon}</span>
+              <span className={clsx('truncate', sidebarCollapsed && 'md:hidden')}>{item.label}</span>
+              {item.badge && (
+                <span className={clsx('ml-auto badge-danger text-xs', sidebarCollapsed && 'md:hidden')}>
+                  {item.badge}
+                </span>
+              )}
+            </NavLink>
+          ))}
+        </nav>
+
+        {/* User section */}
+        {user && (
+          <div className="border-t border-white/06 p-2 flex-shrink-0">
             <div
               className={clsx(
-                'flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-white',
-                'bg-gradient-to-br from-indigo-500 to-purple-600'
+                'flex items-center gap-2.5 px-2 py-2.5 rounded-xl',
+                !sidebarCollapsed && 'mb-1'
               )}
             >
-              {user.display_name.slice(0, 2).toUpperCase()}
-            </div>
-            {!sidebarCollapsed && (
-              <div className="flex-1 min-w-0">
+              {/* Avatar */}
+              <div
+                className={clsx(
+                  'flex-shrink-0 w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold text-white',
+                  'bg-gradient-to-br from-indigo-500 to-purple-600'
+                )}
+              >
+                {user.display_name.slice(0, 2).toUpperCase()}
+              </div>
+              <div className={clsx('flex-1 min-w-0', sidebarCollapsed && 'md:hidden')}>
                 <p className="text-xs font-semibold text-slate-200 truncate">{user.display_name}</p>
                 <RoleBadge role={user.role} />
               </div>
-            )}
+            </div>
+            <button
+              onClick={handleLogout}
+              className={clsx(
+                'nav-item w-full text-red-400 hover:text-red-300 hover:bg-red-500/08',
+                sidebarCollapsed && 'md:justify-center md:px-2'
+              )}
+              title={sidebarCollapsed ? 'Sign Out' : undefined}
+            >
+              <LogOut size={16} />
+              <span className={clsx(sidebarCollapsed && 'md:hidden')}>Sign Out</span>
+            </button>
           </div>
-          <button
-            onClick={handleLogout}
-            className={clsx(
-              'nav-item w-full text-red-400 hover:text-red-300 hover:bg-red-500/08',
-              sidebarCollapsed && 'justify-center px-2'
-            )}
-            title={sidebarCollapsed ? 'Sign Out' : undefined}
-          >
-            <LogOut size={16} />
-            {!sidebarCollapsed && <span>Sign Out</span>}
-          </button>
-        </div>
-      )}
-    </aside>
+        )}
+      </aside>
+    </>
   );
 }
