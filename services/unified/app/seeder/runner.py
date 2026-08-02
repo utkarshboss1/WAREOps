@@ -28,9 +28,12 @@ _XLSX_CANDIDATES = [
     Path("/app/seed_data/warehouse_database.xlsx"),
     Path(__file__).parent.parent / "seed_data" / "warehouse_database.xlsx",
     Path("/warehouse_database.xlsx"),
-    # Fallback: look in repo root (useful for local docker-compose.single.yml run)
-    Path(__file__).parents[5] / "warehouse_database.xlsx",
 ]
+# Fallback: look in repo root (useful for local docker-compose.single.yml run)
+try:
+    _XLSX_CANDIDATES.append(Path(__file__).parents[5] / "warehouse_database.xlsx")
+except IndexError:
+    pass
 
 DEFAULT_WAREHOUSE_ID = settings.WAREHOUSE_ID
 DEFAULT_ORG_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")

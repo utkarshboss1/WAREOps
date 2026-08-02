@@ -18,25 +18,25 @@ DEFAULT_WAREHOUSE_ID = uuid.UUID("a1b2c3d4-e5f6-7890-abcd-ef1234567890")
 DEMO_USERS = [
     {
         "id": uuid.UUID("00000000-0000-0000-0000-000000000010"),
-        "email": "admin@wareops.dev",
+        "email": "admin@wareops.io",
         "display_name": "Admin User",
         "role_name": "ENTERPRISE_ADMIN",
     },
     {
         "id": uuid.UUID("00000000-0000-0000-0000-000000000011"),
-        "email": "manager@wareops.dev",
+        "email": "manager@wareops.io",
         "display_name": "Manager User",
         "role_name": "WAREHOUSE_MANAGER",
     },
     {
         "id": uuid.UUID("00000000-0000-0000-0000-000000000012"),
-        "email": "supervisor@wareops.dev",
+        "email": "supervisor@wareops.io",
         "display_name": "Supervisor User",
         "role_name": "WAREHOUSE_SUPERVISOR",
     },
     {
         "id": uuid.UUID("00000000-0000-0000-0000-000000000013"),
-        "email": "operator@wareops.dev",
+        "email": "operator@wareops.io",
         "display_name": "Operator User",
         "role_name": "WAREHOUSE_OPERATOR",
     },
@@ -71,7 +71,7 @@ async def seed_initial_data() -> None:
             role_map = {r.name: r for r in seeded_roles}
 
             # 3. Seed Demo Users and Assign Roles
-            default_password_hash = hash_password("Password123!")
+            default_password_hash = hash_password("Admin123!")
 
             for u_data in DEMO_USERS:
                 res = await session.execute(
