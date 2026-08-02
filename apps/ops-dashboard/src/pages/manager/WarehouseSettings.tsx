@@ -350,7 +350,7 @@ export default function WarehouseSettings() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080c14] p-6 space-y-6">
+    <div className="space-y-6">
       {showRobotModal && <RegisterRobotModal onClose={() => setShowRobotModal(false)} onRegister={r => setRobots(prev => [r, ...prev])} />}
       {showZoneModal && <AddZoneModal onClose={() => setShowZoneModal(false)} onAdd={z => setZones(prev => [...prev, z])} />}
       {showRuleModal && <AddRuleModal onClose={() => setShowRuleModal(false)} onAdd={r => setAlertRuleStates(prev => [r, ...prev])} />}
