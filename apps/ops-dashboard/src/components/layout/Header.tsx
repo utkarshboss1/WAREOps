@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, User, LogOut, Settings, Layers } from 'lucide-react';
+import { Bell, User, LogOut, Settings, Layers, Menu } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useAppStore } from '../../store/appStore';
 import { authApi } from '../../api/client';
+import { clsx } from 'clsx';
 
-export function Header() {
+interface HeaderProps {
+  onToggleMobileMenu?: () => void;
+}
+
+export function Header({ onToggleMobileMenu }: HeaderProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
   const { sidebarCollapsed, notifications } = useAppStore();
@@ -23,37 +28,50 @@ export function Header() {
 
   return (
     <header 
-      className="fixed top-0 left-0 right-0 h-16 z-20 border-b border-white/08 bg-[#070b16]/90 backdrop-blur-xl px-6 flex items-center justify-between transition-all duration-300 shadow-lg"
+      className={clsx(
+        "fixed top-0 right-0 h-16 z-30 border-b border-white/08 bg-[#070b16]/90 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between transition-all duration-300 shadow-lg",
+        "left-0",
+        sidebarCollapsed ? "md:left-16" : "md:left-60"
+      )}
     >
       <div className="flex items-center space-x-3">
-        <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-mono font-black text-sm shadow-lg shadow-indigo-500/20">
+        {/* Mobile Hamburger Drawer Toggle */}
+        <button
+          onClick={onToggleMobileMenu}
+          className="md:hidden p-2 rounded-xl border border-white/10 bg-white/04 text-slate-300 hover:text-white"
+          title="Toggle Navigation Menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
+        <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-mono font-black text-sm shadow-lg shadow-indigo-500/20 flex-shrink-0">
           W
         </div>
-        <div>
+        <div className="hidden sm:block">
           <span className="text-sm font-bold text-slate-100 tracking-tight font-mono">WAREOps OS</span>
           <span className="text-[10px] text-slate-400 block font-mono">Autonomous Warehouse Intelligence</span>
         </div>
       </div>
 
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2 sm:space-x-4">
         {/* Notifications Dropdown Toggle */}
         <div className="relative">
           <button 
             onClick={() => setShowNotifications(!showNotifications)}
-            className="btn-icon relative"
+            className="btn-icon relative p-2"
           >
             <Bell className="w-4.5 h-4.5 text-slate-300" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-indigo-500 border border-slate-950" />
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-indigo-500 border border-slate-950" />
             )}
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 rounded-xl glass-elevated border border-white/10 p-4 space-y-3 z-50">
+            <div className="absolute right-0 mt-2 w-72 sm:w-80 rounded-xl glass-elevated border border-white/10 p-4 space-y-3 z-50">
               <div className="flex justify-between items-center pb-2 border-b border-white/06">
                 <span className="text-xs font-semibold text-slate-200">Recent Notifications</span>
                 <button 
-                  onClick={() => navigate('/notifications')}
+                  onClick={() => { setShowNotifications(false); navigate('/notifications'); }}
                   className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold"
                 >
                   View All
@@ -77,12 +95,12 @@ export function Header() {
           <div className="relative">
             <button 
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center space-x-2.5 p-1 px-2.5 rounded-xl border border-white/06 bg-white/02 hover:bg-white/04 transition-all"
+              className="flex items-center space-x-2 p-1 px-2 sm:px-2.5 rounded-xl border border-white/06 bg-white/02 hover:bg-white/04 transition-all"
             >
-              <div className="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-300 flex items-center justify-center font-bold text-xs">
+              <div className="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-300 flex items-center justify-center font-bold text-xs flex-shrink-0">
                 {user.display_name.split(' ').map(n => n[0]).join('')}
               </div>
-              <span className="text-xs font-semibold text-slate-200">{user.display_name}</span>
+              <span className="text-xs font-semibold text-slate-200 hidden sm:inline truncate max-w-[100px]">{user.display_name}</span>
             </button>
 
             {showUserMenu && (
