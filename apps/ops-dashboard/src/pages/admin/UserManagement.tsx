@@ -185,7 +185,7 @@ export default function UserManagement() {
   };
 
   return (
-    <div className={`min-h-screen bg-[#080c14] p-6 space-y-6 transition-all ${selectedUser ? 'pr-[416px]' : ''}`}>
+    <div className={`space-y-6 transition-all ${selectedUser ? 'lg:pr-[416px]' : ''}`}>
       {showInviteModal && (
         <InviteModal
           onClose={() => setShowInviteModal(false)}
@@ -194,26 +194,26 @@ export default function UserManagement() {
       )}
 
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-purple-400 mb-1">Administrator</p>
           <h1 className="text-2xl font-bold text-slate-100">User Management</h1>
           <p className="text-sm text-slate-500 mt-1">{userList.length} registered platform users</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <button
             onClick={() => {
               const headers = ['User ID', 'Name', 'Email', 'Role', 'Status', 'Last Login'];
               const rows = filtered.map(u => [u.id, u.display_name, u.email, u.role, u.status, u.last_login_at || 'N/A']);
               exportToCsv('user_roster_export', headers, rows);
             }}
-            className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] px-4 py-2.5 text-sm font-semibold text-slate-300 transition-all cursor-pointer"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-slate-300 transition-all cursor-pointer"
           >
             <Download className="h-4 w-4" /> Export CSV
           </button>
           <button
             onClick={() => setShowInviteModal(true)}
-            className="flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-5 py-2.5 text-sm font-semibold text-white transition-all shadow-lg shadow-indigo-500/20 cursor-pointer"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white transition-all shadow-lg shadow-indigo-500/20 cursor-pointer"
           >
             <UserPlus className="h-4 w-4" /> Invite User
           </button>
@@ -250,8 +250,8 @@ export default function UserManagement() {
       </div>
 
       {/* Users Table */}
-      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] overflow-hidden">
-        <table className="w-full">
+      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] overflow-x-auto">
+        <table className="w-full min-w-[600px]">
           <thead>
             <tr className="border-b border-white/[0.04]">
               {['User', 'Role', 'Status', 'Last Active', 'Actions'].map(h => (
