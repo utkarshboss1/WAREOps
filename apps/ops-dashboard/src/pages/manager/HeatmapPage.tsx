@@ -195,9 +195,9 @@ export default function HeatmapPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080c14] p-6 space-y-5">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-400 mb-1">Visualization</p>
           <h1 className="text-2xl font-bold text-slate-100">Warehouse Heatmap</h1>
