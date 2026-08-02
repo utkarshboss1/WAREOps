@@ -273,16 +273,16 @@ export default function AdminOverview() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080c14] p-6 space-y-6">
+    <div className="space-y-6">
 
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-purple-400 mb-1">Administrator</p>
           <h1 className="text-2xl font-bold text-slate-100">Organization Overview</h1>
           <p className="text-sm text-slate-500 mt-1">Global view across {warehouses.length} warehouse(s)</p>
         </div>
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] px-6 py-4 text-center">
+        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] px-5 py-3 text-center self-start sm:self-auto">
           <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Org Health</p>
           <p className="text-4xl font-bold mt-1" style={{ color: orgScore >= 80 ? '#10b981' : '#6366f1' }}>{orgScore || '—'}</p>
         </div>
