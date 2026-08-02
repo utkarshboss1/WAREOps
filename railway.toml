@@ -1,0 +1,32 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# WAREOps — Railway Configuration (UNIFIED single-service deployment)
+#
+# Railway footprint: 3 things total
+#   1. PostgreSQL plugin  (Railway managed)
+#   2. Redis plugin       (Railway managed)
+#   3. wareops-app        (this service — all 7 microservices + simulator + SPA)
+#
+# Add the Postgres and Redis plugins in the Railway dashboard.
+# Then create ONE service pointing at this repo.
+# ─────────────────────────────────────────────────────────────────────────────
+
+[build]
+# Build context is the repo ROOT so the Dockerfile can:
+#   COPY apps/ops-dashboard/   (SPA source)
+#   COPY services/unified/app  (Python source)
+#   COPY warehouse_database.xlsx
+builder = "DOCKERFILE"
+dockerfilePath = "services/unified/Dockerfile"
+buildContext = "."
+
+[build.buildArgs]
+VITE_API_BASE_URL = "/api/v1"
+VITE_TOPOLOGY_API_URL = "/api/v1"
+VITE_WS_URL = ""
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+numReplicas = 1

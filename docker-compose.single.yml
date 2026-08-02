@@ -1,0 +1,93 @@
+# docker-compose.single.yml — Mirrors Railway exactly: Postgres + Redis + 1 app service.
+#
+# Usage:
+#   # Build frontend first:
+#   cd apps/ops-dashboard && npm run build && cd ../..
+#
+#   # Start everything:
+#   docker compose -f docker-compose.single.yml up --build
+#
+#   # Open dashboard: http://localhost:8080
+#   # API docs:       http://localhost:8080/docs
+
+networks:
+  wareops-net:
+    driver: bridge
+
+volumes:
+  postgres_data_single:
+  redis_data_single:
+
+services:
+
+  # ── Postgres ────────────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: wareops-postgres
+    environment:
+      POSTGRES_USER: warehouse_admin
+      POSTGRES_PASSWORD: warehouse_secret
+      POSTGRES_DB: warehouse_platform
+    volumes:
+      - postgres_data_single:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init.sql:/docker-entrypoint-initdb.d/00_init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U warehouse_admin -d warehouse_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - wareops-net
+    ports:
+      - "5433:5432"   # Use 5433 to avoid clash with existing postgres on 5432
+
+  # ── Redis ───────────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: wareops-redis
+    command: redis-server --requirepass redis_secret
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_secret", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis_data_single:/data
+    networks:
+      - wareops-net
+    ports:
+      - "6380:6379"   # Use 6380 to avoid clash with existing redis on 6379
+
+  # ── Unified app (all 7 services + simulator + seeder + SPA) ─────────────────────
+  wareops:
+    build:
+      context: .
+      dockerfile: services/unified/Dockerfile
+      args:
+        VITE_API_BASE_URL: /api/v1
+        VITE_TOPOLOGY_API_URL: /api/v1
+        VITE_WS_URL: ""
+    container_name: wareops-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      PORT: 8080
+      DATABASE_URL: "postgresql+asyncpg://warehouse_admin:warehouse_secret@postgres:5432/warehouse_platform"
+      REDIS_URL: "redis://:redis_secret@redis:6379/0"
+      SECRET_KEY: "local-dev-secret-key-change-in-production-must-be-32chars!!!"
+      ENVIRONMENT: development
+      LOG_LEVEL: INFO
+      ENABLE_SIMULATOR: "true"
+      ENABLE_SEEDER: "true"
+      ROBOT_COUNT: "3"
+      WAREHOUSE_ID: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+      FRONTEND_URL: "http://localhost:8080"
+      CORS_ORIGINS: '["*"]'
+    ports:
+      - "8080:8080"
+    networks:
+      - wareops-net
+    restart: unless-stopped
