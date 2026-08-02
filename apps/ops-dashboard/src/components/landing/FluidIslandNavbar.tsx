@@ -20,10 +20,9 @@ export const FluidIslandNavbar: React.FC<FluidIslandNavbarProps> = ({ onLaunchAu
   }, []);
 
   const navLinks = [
-    { name: 'Platform', id: 'hero' },
-    { name: 'Digital Twin', id: 'spatial-twin' },
-    { name: 'Architecture', id: 'architecture' },
-    { name: 'Role Command', id: 'roles' },
+    { name: 'The Problem', id: 'problem' },
+    { name: 'The Solution', id: 'solution' },
+    { name: 'Hardware Architecture', id: 'know-the-bot' },
   ];
 
   return (
@@ -46,13 +45,6 @@ export const FluidIslandNavbar: React.FC<FluidIslandNavbarProps> = ({ onLaunchAu
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-extrabold tracking-tight text-white font-mono">WAREOps</span>
-                <span className="text-[9px] font-semibold font-mono px-1.5 py-0.2 rounded bg-indigo-500/10 border border-indigo-500/30 text-indigo-300">
-                  v2.4
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[9px] font-mono tracking-widest uppercase text-slate-400">AMR Fleet Live</span>
               </div>
             </div>
           </div>
