@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Bot,
   AlertTriangle,
   Layers,
   ArrowRight,
-  Sparkles,
   ShieldCheck,
-  Cpu,
-  Database,
   Activity,
   CheckCircle2,
   XCircle,
@@ -21,12 +18,10 @@ import {
   Linkedin,
   Github,
   Mail,
-  Zap,
   Radio,
   FileCheck,
   TrendingDown,
-  BarChart3,
-  Server
+  BarChart3
 } from 'lucide-react';
 import { FluidIslandNavbar } from '../components/landing/FluidIslandNavbar';
 import { EnterpriseFooter } from '../components/landing/EnterpriseFooter';
@@ -68,7 +63,6 @@ const TEAM_MEMBERS = [
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'problem' | 'solution' | 'specifics'>('problem');
 
   const handleLaunchAuth = () => {
     navigate('/auth/login');
@@ -101,13 +95,7 @@ export default function OnboardingPage() {
       <FluidIslandNavbar onLaunchAuth={handleLaunchAuth} onNavigateSection={scrollToSection} />
 
       {/* HERO SECTION - NARRATIVE ENTRY */}
-      <section id="hero" className="relative z-10 pt-36 pb-20 px-4 max-w-6xl mx-auto flex flex-col items-center text-center">
-        {/* Subtle pill badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-mono font-medium mb-8">
-          <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
-          <span>Continuous Warehouse Intelligence • Platform Overview</span>
-        </div>
-
+      <section id="hero" className="relative z-10 pt-28 pb-20 px-4 max-w-6xl mx-auto flex flex-col items-center text-center">
         {/* Narrative H1 */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.1] max-w-4xl">
           From Silent Inventory Discrepancy to{' '}
@@ -140,51 +128,6 @@ export default function OnboardingPage() {
           </button>
         </div>
 
-        {/* Quick Narrative Navigation Bar */}
-        <div className="mt-16 w-full max-w-3xl bg-slate-900/60 border border-white/10 rounded-2xl p-2 backdrop-blur-xl flex items-center justify-between text-xs font-medium">
-          <button
-            onClick={() => {
-              setActiveTab('problem');
-              scrollToSection('problem');
-            }}
-            className={`flex-1 py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'problem'
-                ? 'bg-gradient-to-r from-red-500/20 to-amber-500/20 border border-red-500/30 text-white font-bold'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <AlertTriangle className="h-4 w-4 text-red-400" />
-            <span>1. The Problem</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab('solution');
-              scrollToSection('solution');
-            }}
-            className={`flex-1 py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'solution'
-                ? 'bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 border border-cyan-500/30 text-white font-bold'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Bot className="h-4 w-4 text-cyan-400" />
-            <span>2. The Solution</span>
-          </button>
-          <button
-            onClick={() => {
-              setActiveTab('specifics');
-              scrollToSection('specifics');
-            }}
-            className={`flex-1 py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'specifics'
-                ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 text-white font-bold'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Cpu className="h-4 w-4 text-emerald-400" />
-            <span>3. How It Works</span>
-          </button>
-        </div>
       </section>
 
       {/* SECTION 1: THE CORE PROBLEM */}
@@ -397,99 +340,11 @@ export default function OnboardingPage() {
         </div>
       </section>
 
-      {/* SECTION 3: SYSTEM SPECIFICS & ARCHITECTURE */}
-      <section id="specifics" className="relative z-10 py-24 px-4 max-w-6xl mx-auto border-t border-white/[0.06]">
-        <div className="space-y-16">
-          
-          {/* Header */}
-          <div className="max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono font-semibold uppercase tracking-wider">
-              <Cpu className="h-3.5 w-3.5" /> Phase III: System Specifics
-            </div>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
-              Engineered for Enterprise Resiliency & Scale
-            </h2>
-            <p className="text-slate-300 text-base sm:text-lg leading-relaxed">
-              Explore the technical building blocks that power the WAREOps ecosystem—from microservice decoupling to role-tailored operational consoles.
-            </p>
-          </div>
+      {/* SECTION 3: KNOW THE BOT HARDWARE & SOFTWARE ARCHITECTURE */}
 
-          {/* Technical Pillar Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
-            {/* Pillar 1 */}
-            <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/10 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">
-                  <Database className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Spatial Digital Twin Engine</h3>
-                  <span className="text-xs text-slate-400 font-mono">Sub-Second WebSocket Synchronization</span>
-                </div>
-              </div>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                The Digital Twin engine maps physical warehouse coordinates (Zone → Aisle → Rack → Shelf → Bin) into an interactive matrix view. WebSocket pipelines stream live robot location markers and audit statuses in real time.
-              </p>
-            </div>
-
-            {/* Pillar 2 */}
-            <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/10 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
-                  <Server className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Event-Driven Microservices</h3>
-                  <span className="text-xs text-slate-400 font-mono">Kafka + Outbox Pattern Architecture</span>
-                </div>
-              </div>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Autonomous microservices communicate asynchronously via Apache Kafka. The Observation Service uses a transactional outbox pattern to guarantee database state and event bus events remain strictly consistent.
-              </p>
-            </div>
-
-            {/* Pillar 3 */}
-            <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/10 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-                  <ShieldCheck className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Role-Based Operational Matrix</h3>
-                  <span className="text-xs text-slate-400 font-mono">RBAC Security & Scoped Dashboards</span>
-                </div>
-              </div>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Tailored user workflows ensure maximum efficiency: Operators receive mismatch verification tasks on mobile screens, Supervisors launch mission sequences, and Managers analyze executive discrepancy analytics.
-              </p>
-            </div>
-
-            {/* Pillar 4 */}
-            <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/10 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
-                  <Zap className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Robot Telemetry & Heartbeat Watchdogs</h3>
-                  <span className="text-xs text-slate-400 font-mono">Offline Buffer & Automatic Re-Sync</span>
-                </div>
-              </div>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                When AMRs navigate Wi-Fi deadzones, onboard SQLite databases buffer scan telemetry offline. Once connectivity is restored, the Mission Service reconciles missed heartbeats seamlessly.
-              </p>
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-      {/* SECTION 4: KNOW THE BOT HARDWARE & SOFTWARE ARCHITECTURE */}
       <KnowTheBotSection />
 
-      {/* SECTION 5: TEAM INTRODUCTION */}
+      {/* SECTION 4: TEAM INTRODUCTION */}
       <section id="team" className="relative z-10 py-24 px-4 max-w-6xl mx-auto border-t border-white/[0.06]">
         <div className="space-y-16">
           
@@ -523,7 +378,7 @@ export default function OnboardingPage() {
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600/30 to-purple-600/30 border-2 border-indigo-500/40 flex items-center justify-center text-indigo-200 font-mono font-black text-lg shadow-lg shadow-indigo-500/25 group-hover:border-indigo-400 group-hover:shadow-indigo-500/40 transition-all">
                         {member.initials}
                       </div>
-                      <span className="px-3.5 py-1.5 rounded-full text-[10px] font-mono font-extrabold tracking-widest uppercase bg-indigo-500/15 border border-indigo-500/40 text-indigo-300 shadow-md backdrop-blur-md group-hover:border-indigo-400 transition-colors">
+                      <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-mono font-extrabold tracking-wider uppercase bg-indigo-500/15 border border-indigo-500/40 text-indigo-300 shadow-md backdrop-blur-md group-hover:border-indigo-400 transition-colors truncate max-w-[150px] sm:max-w-none">
                         {member.badge}
                       </span>
                     </div>
@@ -556,7 +411,7 @@ export default function OnboardingPage() {
                       <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600/30 to-purple-600/30 border-2 border-indigo-500/40 flex items-center justify-center text-indigo-200 font-mono font-black text-lg shadow-lg shadow-indigo-500/25 group-hover:border-indigo-400 group-hover:shadow-indigo-500/40 transition-all">
                         {member.initials}
                       </div>
-                      <span className="px-3.5 py-1.5 rounded-full text-[10px] font-mono font-extrabold tracking-widest uppercase bg-indigo-500/15 border border-indigo-500/40 text-indigo-300 shadow-md backdrop-blur-md group-hover:border-indigo-400 transition-colors">
+                      <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[9px] sm:text-[10px] font-mono font-extrabold tracking-wider uppercase bg-indigo-500/15 border border-indigo-500/40 text-indigo-300 shadow-md backdrop-blur-md group-hover:border-indigo-400 transition-colors truncate max-w-[150px] sm:max-w-none">
                         {member.badge}
                       </span>
                     </div>
