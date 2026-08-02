@@ -232,7 +232,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080c14] p-6 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-400 mb-1">Analytics</p>
