@@ -64,7 +64,7 @@ function RoleDefaultRedirect() {
   const { isAuthenticated, user } = useAuthStore();
 
   if (!isAuthenticated || !user) {
-    return <OnboardingPage />;
+    return <Navigate to="/onboarding" replace />;
   }
 
   switch (user.role) {
@@ -77,7 +77,7 @@ function RoleDefaultRedirect() {
     case 'WAREHOUSE_OPERATOR':
       return <Navigate to="/operator/dashboard" replace />;
     default:
-      return <OnboardingPage />;
+      return <Navigate to="/onboarding" replace />;
   }
 }
 
@@ -85,7 +85,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public/Auth/Landing Routes */}
+        {/* Public Standalone Landing & Onboarding Routes */}
+        <Route path="/" element={<RoleDefaultRedirect />} />
         <Route path="/landing" element={<OnboardingPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
         <Route path="/dashboard-preview" element={<LandingPage />} />
@@ -97,9 +98,7 @@ export default function App() {
         <Route path="/auth/accept-invite" element={<AcceptInvitePage />} />
 
         {/* Protected Dashboard Layout Routes */}
-        <Route path="/" element={<Layout />}>
-          <Route index element={<RoleDefaultRedirect />} />
-
+        <Route element={<Layout />}>
           {/* Operator Routes */}
           <Route
             path="operator/dashboard"
